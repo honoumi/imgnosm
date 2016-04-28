@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" layout:decorator="layout">
+
+<head>
+	<title> test </title>
+
+</head>
+
+<body>
+	<h1 layout:fragment="header">test</h1>
+	<div layout:fragment="content" class="container">
+		<div class="pull-left">
+			<a th:href="@{https://api.weibo.com/oauth2/authorize(client_id='2683253229', response_type='code',redirect_uri='http://123.206.59.138/oauth')}">新浪微博 OAUTH2</a>
+		</div>
+
+	</div>
+</body>
+
+</html>

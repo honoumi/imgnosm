@@ -1,5 +1,5 @@
 
-package sample.web.ui.mvc;
+package imgnosm.web.ui.mvc;
 
 import groovyjarjarasm.asm.tree.IntInsnNode;
 
@@ -16,9 +16,9 @@ import java.util.Set;
 
 import javax.validation.Valid;
 
-import sample.web.ui.Message;
-import sample.web.ui.MessageRepository;
-import sample.web.ui.HttpRequest;
+import imgnosm.web.ui.Message;
+import imgnosm.web.ui.MessageRepository;
+import imgnosm.web.ui.HttpRequest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -46,8 +46,8 @@ public class MessageController {
 	public static final String client_id = "2683253229";
 	public static final String client_secret = "ad67b6de9b650688c57b0910ad0fd670";
 	public static final String redirect_uri = "http://123.206.59.138/oauth";
-	
-	
+
+
 	public MessageController(MessageRepository messageRepository) {
 		this.messageRepository = messageRepository;
 	}
@@ -60,7 +60,7 @@ public class MessageController {
 	@RequestMapping(value = "oauth", params = "code", method = RequestMethod.GET)
 	public ModelAndView oauth(@ModelAttribute("code") String code) {
 		System.out.println(code);
-		
+
 		String access_token_json = HttpRequest.sendPost("https://api.weibo.com/oauth2/access_token?client_id=" + client_id
 													+ "&client_secret=" + client_secret
 													+ "&grant_type=authorization_code&redirect_uri=" + redirect_uri
@@ -79,11 +79,11 @@ public class MessageController {
 		System.out.println(user_timeline_json);
 		String[] texts = null;
 		try {
-	
+
 			ArrayList statuses =(ArrayList) objectMapper.readValue(user_timeline_json, Map.class).get("statuses");
 
 			System.out.println(statuses.size());
-			
+
 			int statuses_size = statuses.size();
 			texts = new String[statuses_size + 1];
 			for(int i = 0; i < statuses_size; i++)
@@ -93,15 +93,15 @@ public class MessageController {
 				texts[statuses_size] = "幸福";
 			else
 				texts[statuses_size] = "不幸福";
-			
-			
+
+
 		}  catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		
+
+
+
 		return new ModelAndView("oauth", "texts", texts);
 	}
 

@@ -1,5 +1,5 @@
 
-package sample.web.ui;
+package imgnosm.web.ui;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

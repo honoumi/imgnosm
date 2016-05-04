@@ -1,5 +1,5 @@
 
-package sample.web.ui;
+package imgnosm.web.ui;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

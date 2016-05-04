@@ -1,5 +1,5 @@
 
-package sample.web.ui;
+package imgnosm.web.ui;
 
 import java.util.Calendar;
 

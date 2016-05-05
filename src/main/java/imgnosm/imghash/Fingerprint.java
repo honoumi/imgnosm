@@ -119,23 +119,6 @@ public class Fingerprint {
 	}
 
 
-
-	 
-
-	 
-	public static void main(String[] args) {
-		String s1 = null, s2 = null;
-		s1 =  getFingerprintPhash("src\\image\\person.jpg");
-
-		System.out.println("source: " + s1);
-
-		for(int i=1; i<=11; i++) {
-			s2 =  getFingerprintPhash("src\\image\\person"+ i + ".jpg");
-
-			System.out.print(i + "-" + hammingDistance(s1, s2) + "\t");
-		}
-	}
-
 }
 
  

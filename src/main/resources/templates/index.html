@@ -13,7 +13,10 @@
 		<div class="pull-left">
 			<a th:href="@{https://api.weibo.com/oauth2/authorize(client_id='2683253229', response_type='code',redirect_uri='http://123.206.59.138/oauth')}">新浪微博 OAUTH2</a>
 		</div>
-
+		<form action="/upload" method="post" enctype="multipart/form-data">
+			<input type="file" name="file" id="file" accept="image/*" />
+			<input type="submit" value="Submit" />
+		</form>
 	</div>
 </body>
 

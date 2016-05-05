@@ -51,6 +51,7 @@ import org.codehaus.jackson.node.JsonNodeFactory;
 
 import imgnosm.imghash.Fingerprint;
 import imgnosm.imghash.Imghash;
+import imgnosm.imghash.StoragePool;
 
 @Controller
 @RequestMapping("/")
@@ -108,34 +109,7 @@ public class MessageController {
     }  
     
     
-    public static void readAllFile(String filePath, String hash, List<File> list) {  
-        File f = null;  
-        f = new File(filePath);  
-        File[] files = f.listFiles(); // 得到f文件夹下面的所有文件。  
-        for (File file : files) {  
-            if(file.isDirectory()) {  
-                //如何当前路劲是文件夹，则循环读取这个文件夹下的所有文件  
-                readAllFile(file.getAbsolutePath(), hash, list);  
-            } else {  
-                list.add(file);  
-            }  
-        }  
-    }  
-    
-    public static String searchAllFile(String filePath, String hash) {  
-        List<File> list = new ArrayList<File>();  
-        List<String> resultList = new ArrayList<String>(); 
-        readAllFile(filePath, hash, list);
-        
-        for(File file : list) {  
-        	String file_path = file.getAbsolutePath();
-        	String filename = file.getName();
-            if (Imghash.hammingDistance(hash, Fingerprint.getFingerprintPhash(file_path)) < 4)
-            	return file_path;
-        }  
-        
-        return "null";
-    }  
+
     
     
     @RequestMapping(value = "imgSearch", headers = "content-type=multipart/*", method = RequestMethod.POST)  
@@ -153,7 +127,7 @@ public class MessageController {
                 file.transferTo(new File(filePath));  
                 String hash = Fingerprint.getFingerprintPhash(filePath);
                 
-                result = searchAllFile(nowPath + "\\img", hash);
+                result = StoragePool.searchAllFile(nowPath + "\\img", hash);
             } catch (Exception e) {  
                 e.printStackTrace();  
             }  

@@ -1,5 +1,9 @@
 package imgnosm.imghash;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /** 
  * 工具类
@@ -19,8 +23,10 @@ public class Imghash	{
 	
 	public static int hammingDistance(String s1, String s2)
 	{
-		long l1 = Long.parseLong(s1, 16);
-		long l2 = Long.parseLong(s2, 16);
+		long l1 = Long.parseUnsignedLong(s1, 16);
+		long l2 = Long.parseUnsignedLong(s2, 16);
 		return bitCount(l1 ^ l2);
 	}
+	
+
 }

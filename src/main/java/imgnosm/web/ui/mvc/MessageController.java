@@ -50,6 +50,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.JsonNodeFactory;
 
 import imgnosm.imghash.Fingerprint;
+import imgnosm.imghash.Imghash;
 
 @Controller
 @RequestMapping("/")
@@ -123,12 +124,13 @@ public class MessageController {
     
     public static String searchAllFile(String filePath, String hash) {  
         List<File> list = new ArrayList<File>();  
-
+        List<String> resultList = new ArrayList<String>(); 
         readAllFile(filePath, hash, list);
         
         for(File file : list) {  
         	String file_path = file.getAbsolutePath();
-            if (hash.equals(Fingerprint.getFingerprintPhash(file_path)))
+        	String filename = file.getName();
+            if (Imghash.hammingDistance(hash, Fingerprint.getFingerprintPhash(file_path)) < 4)
             	return file_path;
         }  
         

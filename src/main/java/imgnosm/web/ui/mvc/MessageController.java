@@ -81,6 +81,8 @@ public class MessageController {
 		return new ModelAndView("oauth", "texts", results);
 	}
 	
+
+	
     @RequestMapping(value = "upload", headers = "content-type=multipart/*", method = RequestMethod.POST)  
     public @ResponseBody String fileUpload(@RequestParam("file") MultipartFile file) { 
     	
@@ -102,9 +104,41 @@ public class MessageController {
 
         return "hash : " + hash;  
     }  
+    
+    
+    public static void readAllFile(String filePath, String hash, List<File> list) {  
+        File f = null;  
+        f = new File(filePath);  
+        File[] files = f.listFiles(); // 得到f文件夹下面的所有文件。  
+        for (File file : files) {  
+            if(file.isDirectory()) {  
+                //如何当前路劲是文件夹，则循环读取这个文件夹下的所有文件  
+                readAllFile(file.getAbsolutePath(), hash, list);  
+            } else {  
+                list.add(file);  
+            }  
+        }  
+    }  
+    
+    public static String searchAllFile(String filePath, String hash) {  
+        List<File> list = new ArrayList<File>();  
 
+        readAllFile(filePath, hash, list);
+        
+        for(File file : list) {  
+        	String file_path = file.getAbsolutePath();
+            if (hash.equals(Fingerprint.getFingerprintPhash(file_path)))
+            	return file_path;
+        }  
+        
+        return "null";
+    }  
+    
+    
     @RequestMapping(value = "imgSearch", headers = "content-type=multipart/*", method = RequestMethod.POST)  
     public @ResponseBody String imgSearch(@RequestParam("file") MultipartFile file) { 
+    	
+    	String result = "";
     	
         // 判断文件是否为空  
         if (!file.isEmpty()) {  
@@ -115,12 +149,14 @@ public class MessageController {
                 // 转存文件  
                 file.transferTo(new File(filePath));  
                 String hash = Fingerprint.getFingerprintPhash(filePath);
+                
+                result = searchAllFile(System.getProperty("user.dir") + "\\img", hash);
             } catch (Exception e) {  
                 e.printStackTrace();  
             }  
         }  
 
-        return "-> ";  
+        return "-> " + result;  
     }  
 
     

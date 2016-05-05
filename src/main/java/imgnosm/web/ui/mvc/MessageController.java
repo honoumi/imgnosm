@@ -3,10 +3,12 @@ package imgnosm.web.ui.mvc;
 
 import groovyjarjarasm.asm.tree.IntInsnNode;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.File;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import imgnosm.web.ui.Message;
@@ -24,6 +28,7 @@ import imgnosm.web.ui.MessageRepository;
 import imgnosm.web.ui.HttpRequest;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,16 +63,10 @@ public class MessageController {
 	}
 
 	@RequestMapping
-	public String list() {
+	public String index() {
 		return "index";
 	}
 
-	@RequestMapping(value = "oauth", params = "code", method = RequestMethod.GET)
-	public ModelAndView oauth(@ModelAttribute("code") String code) {
-
-
-		return new ModelAndView("oauth", "texts", null);
-	}
 
 	@RequestMapping(value = "getHash", params = "hash", method = RequestMethod.GET)
 	public ModelAndView getHash(@ModelAttribute("hash") String hash) {
@@ -81,28 +80,30 @@ public class MessageController {
 		return new ModelAndView("oauth", "texts", results);
 	}
 	
-
+	@RequestMapping(value = "upload", method = RequestMethod.GET)
+	public String uploadView() {
+		return "upload";
+	}
 	
     @RequestMapping(value = "upload", headers = "content-type=multipart/*", method = RequestMethod.POST)  
     public @ResponseBody String fileUpload(@RequestParam("file") MultipartFile file) { 
-    	
-    	String hash = "";
     	
         // 判断文件是否为空  
         if (!file.isEmpty()) {  
             try {  
 
                 // 文件保存路径  
-                String filePath = System.getProperty("user.dir") + "\\upload\\" + file.getOriginalFilename();  
+                String filePath = System.getProperty("user.dir") + "\\img\\" + file.getOriginalFilename();  
                 // 转存文件  
                 file.transferTo(new File(filePath));  
-                hash = Fingerprint.getFingerprintPhash(filePath);
+                String hash = Fingerprint.getFingerprintPhash(filePath);
             } catch (Exception e) {  
                 e.printStackTrace();  
+                return "failed";
             }  
         }  
 
-        return "hash : " + hash;  
+        return "succeed";  
     }  
     
     
@@ -143,14 +144,14 @@ public class MessageController {
         // 判断文件是否为空  
         if (!file.isEmpty()) {  
             try {  
-
+            	String nowPath = System.getProperty("user.dir");
                 // 文件保存路径  
-                String filePath = System.getProperty("user.dir") + "\\upload\\" + file.getOriginalFilename();  
+                String filePath = nowPath + "\\upload\\" + file.getOriginalFilename();  
                 // 转存文件  
                 file.transferTo(new File(filePath));  
                 String hash = Fingerprint.getFingerprintPhash(filePath);
                 
-                result = searchAllFile(System.getProperty("user.dir") + "\\img", hash);
+                result = searchAllFile(nowPath + "\\img", hash);
             } catch (Exception e) {  
                 e.printStackTrace();  
             }  
@@ -159,5 +160,33 @@ public class MessageController {
         return "-> " + result;  
     }  
 
-    
+    /**
+     * 通过url请求返回图像的字节流
+     */
+    @RequestMapping("img/{cateogry}")
+    public void getIcon(@PathVariable("cateogry") String cateogry,
+                        HttpServletRequest request,
+                        HttpServletResponse response) throws IOException {
+
+        if(StringUtils.isEmpty(cateogry)) {
+            cateogry = "";
+        }
+
+        String fileName = System.getProperty("user.dir") + "\\img\\" + cateogry + ".jpg";
+
+        File file = new File(fileName);
+
+
+        FileInputStream inputStream = new FileInputStream(file);
+        byte[] data = new byte[(int)file.length()];
+        int length = inputStream.read(data);
+        inputStream.close();
+
+        response.setContentType("image/jpg");
+
+        OutputStream stream = response.getOutputStream();
+        stream.write(data);
+        stream.flush();
+        stream.close();
+    }
 }

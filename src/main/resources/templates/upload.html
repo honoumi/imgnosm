@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" layout:decorator="layout">
+
+<head>
+	<title> upload test </title>
+
+</head>
+
+<body>
+	<h1 layout:fragment="header">upload test</h1>
+	<div layout:fragment="content" class="container">
+
+		<form action="/upload" method="post" enctype="multipart/form-data">
+			<input type="file" name="file" id="file" accept="image/*" />
+			<input type="submit" value="Submit" />
+		</form>
+	</div>
+</body>
+
+</html>

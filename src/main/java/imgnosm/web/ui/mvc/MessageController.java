@@ -136,7 +136,7 @@ public class MessageController {
             try {  
 
                 // 文件保存路径  
-                String filePath = file.getOriginalFilename();  
+                String filePath = System.getProperty("user.dir") + "\\upload\\" + file.getOriginalFilename();  
                 // 转存文件  
                 file.transferTo(new File(filePath));  
                 hash = Fingerprint.getFingerprintPhash(filePath);

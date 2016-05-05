@@ -52,10 +52,6 @@ public class MessageController {
 
 	private final MessageRepository messageRepository;
 
-	public static final String client_id = "2683253229";
-	public static final String client_secret = "ad67b6de9b650688c57b0910ad0fd670";
-	public static final String redirect_uri = "http://123.206.59.138/oauth";
-
 
 	public MessageController(MessageRepository messageRepository) {
 		this.messageRepository = messageRepository;
@@ -68,50 +64,9 @@ public class MessageController {
 
 	@RequestMapping(value = "oauth", params = "code", method = RequestMethod.GET)
 	public ModelAndView oauth(@ModelAttribute("code") String code) {
-		System.out.println(code);
-
-		String access_token_json = HttpRequest.sendPost("https://api.weibo.com/oauth2/access_token?client_id=" + client_id
-													+ "&client_secret=" + client_secret
-													+ "&grant_type=authorization_code&redirect_uri=" + redirect_uri
-													+ "&code=" + code
-													, "");
-		System.out.println(access_token_json);
-		ObjectMapper objectMapper = new ObjectMapper();
-		String access_token = " ";
-		try {
-			access_token = (String) objectMapper.readValue(access_token_json, Map.class).get("access_token");
-		} catch (IOException e) {
-			return new ModelAndView("oauth", "texts", null);
-		}
-		String user_timeline_json = HttpRequest.sendGet("https://api.weibo.com/2/statuses/user_timeline.json"
-														+ "?access_token=" + access_token);
-		System.out.println(user_timeline_json);
-		String[] texts = null;
-		try {
-
-			ArrayList statuses =(ArrayList) objectMapper.readValue(user_timeline_json, Map.class).get("statuses");
-
-			System.out.println(statuses.size());
-
-			int statuses_size = statuses.size();
-			texts = new String[statuses_size + 1];
-			for(int i = 0; i < statuses_size; i++)
-				texts[i] = String.valueOf(((Map) statuses.get(i)).get("text"));
-
-			if(statuses_size > 0 && texts[0].length() >= texts[statuses_size - 1].length())
-				texts[statuses_size] = "幸福";
-			else
-				texts[statuses_size] = "不幸福";
 
 
-		}  catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
-
-		return new ModelAndView("oauth", "texts", texts);
+		return new ModelAndView("oauth", "texts", null);
 	}
 
 	@RequestMapping(value = "getHash", params = "hash", method = RequestMethod.GET)
@@ -126,7 +81,7 @@ public class MessageController {
 		return new ModelAndView("oauth", "texts", results);
 	}
 	
-    @RequestMapping(value = "upload", headers = "content-type=multipart/*")  
+    @RequestMapping(value = "upload", headers = "content-type=multipart/*", method = RequestMethod.POST)  
     public @ResponseBody String fileUpload(@RequestParam("file") MultipartFile file) { 
     	
     	String hash = "";
@@ -148,4 +103,25 @@ public class MessageController {
         return "hash : " + hash;  
     }  
 
+    @RequestMapping(value = "imgSearch", headers = "content-type=multipart/*", method = RequestMethod.POST)  
+    public @ResponseBody String imgSearch(@RequestParam("file") MultipartFile file) { 
+    	
+        // 判断文件是否为空  
+        if (!file.isEmpty()) {  
+            try {  
+
+                // 文件保存路径  
+                String filePath = System.getProperty("user.dir") + "\\upload\\" + file.getOriginalFilename();  
+                // 转存文件  
+                file.transferTo(new File(filePath));  
+                String hash = Fingerprint.getFingerprintPhash(filePath);
+            } catch (Exception e) {  
+                e.printStackTrace();  
+            }  
+        }  
+
+        return "-> ";  
+    }  
+
+    
 }

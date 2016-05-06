@@ -127,7 +127,9 @@ public class MessageController {
                 file.transferTo(new File(filePath));  
                 String hash = Fingerprint.getFingerprintPhash(filePath);
                 
-                result = StoragePool.searchAllFile(nowPath + "\\img", hash);
+//                result = StoragePool.searchAllFile(nowPath + "\\img", hash);
+                
+                result = StoragePool.search(hash);
             } catch (Exception e) {  
                 e.printStackTrace();  
             }  

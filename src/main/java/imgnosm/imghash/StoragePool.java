@@ -6,25 +6,64 @@ import java.util.List;
 
 public class StoragePool {
 	
+	public static class ImgHashNode	{
+		String hash;
+		String imgName;
+		
+		public ImgHashNode(String hash, String imgName)	{
+			this.hash = hash;
+			this.imgName = imgName;
+		}
+		
+		public String getHash() { 
+			return this.hash;
+		}
+		
+		public String getImgName() { 
+			return this.imgName; 
+		}
+	}
+	
+	public static List<ImgHashNode> pool = new ArrayList<ImgHashNode>();
+	
+	public static void init()	{
+		String path = System.getProperty("user.dir") + "\\img\\";
+		
+		List<File> list = readAllFile(path);
+		
+		for (File file : list) {
+			String filepath = file.getAbsolutePath();
+			String filename = getFileNameNoEx(file.getName());
 
-	public static void readAllFile(String filePath, String hash, List<File> list) {
+			String hash = Fingerprint.getFingerprintPhash(filepath);
+
+			pool.add(new ImgHashNode(hash, filename));
+		}
+	}
+	
+	public static void readAllFile(String filePath, List<File> list) {
 		File f = null;
 		f = new File(filePath);
-		File[] files = f.listFiles(); // 得到f文件夹下面的所有文件。
+		File[] files = f.listFiles();
 		for (File file : files) {
 			if (file.isDirectory()) {
-				// 如何当前路劲是文件夹，则循环读取这个文件夹下的所有文件
-				readAllFile(file.getAbsolutePath(), hash, list);
+				readAllFile(file.getAbsolutePath(), list);
 			} else {
 				list.add(file);
 			}
 		}
 	}
+	
+	public static List<File> readAllFile(String path)	{
+		List<File> list = new ArrayList<File>();
+		readAllFile(path, list);
+		return list;
+	}
 
 	public static String searchAllFile(String filePath, String hash) {
 		List<File> list = new ArrayList<File>();
 		List<String> resultList = new ArrayList<String>();
-		readAllFile(filePath, hash, list);
+		readAllFile(filePath, list);
 
 		for (File file : list) {
 			String file_path = file.getAbsolutePath();
@@ -61,5 +100,15 @@ public class StoragePool {
 			}
 		}
 		return filename;
+	}
+	
+	public static String search(String hash)	
+	{
+		for(ImgHashNode ni : pool)	{
+			if(hash.equals(ni.getHash()))
+				return ni.getImgName();
+		}
+		
+		return null;
 	}
 }

@@ -3,34 +3,38 @@ package imgnosm.imghash;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import redis.clients.jedis.Jedis;
 
 public class StoragePool {
 	
-	public static class ImgHashNode	{
+	
+
+	public static class ImgHashNode {
 		String hash;
 		String imgName;
-		
-		public ImgHashNode(String hash, String imgName)	{
+
+		public ImgHashNode(String hash, String imgName) {
 			this.hash = hash;
 			this.imgName = imgName;
 		}
-		
-		public String getHash() { 
+
+		public String getHash() {
 			return this.hash;
 		}
-		
-		public String getImgName() { 
-			return this.imgName; 
+
+		public String getImgName() {
+			return this.imgName;
 		}
 	}
-	
+
 	public static List<ImgHashNode> pool = new ArrayList<ImgHashNode>();
-	
-	public static void init()	{
+	public static Jedis jedis;
+
+	public static void init() {
 		String path = System.getProperty("user.dir") + "\\img\\";
-		
+
 		List<File> list = readAllFile(path);
-		
+
 		for (File file : list) {
 			String filepath = file.getAbsolutePath();
 			String filename = getFileNameNoEx(file.getName());
@@ -39,8 +43,28 @@ public class StoragePool {
 
 			pool.add(new ImgHashNode(hash, filename));
 		}
+
+		jedis = new Jedis("localhost");
+		System.out.println("Connection to server sucessfully");
+		
+		
+		
+		for(ImgHashNode ni : pool)	{
+//			jedis.lpush("test-pool", ni.getHash());
+//			jedis.set(ni.getHash(), ni.getImgName());
+		}
+		
+		// 连接本地的 Redis 服务
+		// 存储数据到列表中
+
+		List<String> templist = jedis.lrange("tutorial-list", 0, 5);
+		
+		for (int i = 0; i < templist.size(); i++) {
+			System.out.println("Stored string in redis:: " + templist.get(i));
+		}
+
 	}
-	
+
 	public static void readAllFile(String filePath, List<File> list) {
 		File f = null;
 		f = new File(filePath);
@@ -53,8 +77,8 @@ public class StoragePool {
 			}
 		}
 	}
-	
-	public static List<File> readAllFile(String path)	{
+
+	public static List<File> readAllFile(String path) {
 		List<File> list = new ArrayList<File>();
 		readAllFile(path, list);
 		return list;
@@ -101,14 +125,14 @@ public class StoragePool {
 		}
 		return filename;
 	}
-	
-	public static String search(String hash)	
-	{
-		for(ImgHashNode ni : pool)	{
-			if(hash.equals(ni.getHash()))
+
+	public static String search(String hash) {
+		for (ImgHashNode ni : pool) {
+			if (Imghash.hammingDistance(hash,
+					ni.getHash()) < 4)
 				return ni.getImgName();
 		}
-		
+
 		return null;
 	}
 }
